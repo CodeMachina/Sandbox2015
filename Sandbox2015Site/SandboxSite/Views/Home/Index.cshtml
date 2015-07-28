@@ -32,17 +32,24 @@
         <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
     </div>
 </div>
+<div>
+    <input id="test-button" type="button" value="Click Me!"/>
+</div>
 
+@section scripts{    
 <script>
-    var blah = document.createElement("div");
-    blah.setAttribute("class", "popup");
-    var textNode = document.createTextNode("We are watching you!!!!!!!");
-    blah.appendChild(textNode);
+    jQuery(document).ready(function () {
+        jQuery('#test-button').on('click', function () {
+            var blah = document.createElement("div");
+            blah.setAttribute("class", "popup");
+            var textNode = document.createTextNode("We are watching you!!!!!!!");
+            blah.appendChild(textNode);
 
-    setTimeout(function () {
-        document.body.appendChild(blah);
-    }, 3000);
+            document.body.appendChild(blah);
+        });
+    });      
 </script>
+}
 <style>
     .popup {
         height:400px;
