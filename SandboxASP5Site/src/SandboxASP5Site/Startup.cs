@@ -13,6 +13,8 @@ using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Mvc;
+using Microsoft.AspNet.Mvc.Core;
 using Microsoft.AspNet.Routing;
 using Microsoft.Data.Entity;
 using Microsoft.Framework.Configuration;
@@ -27,8 +29,8 @@ namespace SandboxASP5Site
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv)
-        {
+        public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv, IApplicationShutdown shutdown)
+        {         
             // Setup configuration sources.
 
             var builder = new ConfigurationBuilder(appEnv.ApplicationBasePath)
@@ -86,10 +88,12 @@ namespace SandboxASP5Site
             // Register application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
+            services.AddSingleton<IRegisterRoutes, RegisterRoutes>();
+            services.AddSingleton<IControllerFactory, SingleActionControllerFactory>();
         }
 
         // Configure is called after ConfigureServices is called.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IRegisterRoutes registerRoutes)
         {
             loggerFactory.MinimumLevel = LogLevel.Information;
             loggerFactory.AddConsole();
@@ -124,15 +128,75 @@ namespace SandboxASP5Site
             // app.UseTwitterAuthentication();
 
             // Add MVC to the request pipeline.
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+            app.UseMvc(registerRoutes.BuildRoutes);
+            //app.UseMvc(routes =>
+            //{
+            //    routes.MapRoute(
+            //        name: "default",
+            //        template: "{controller=Home}/{action=Index}/{id?}");
 
-                // Uncomment the following line to add a route for porting Web API 2 controllers.
-                // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
-            });
+            //    // Uncomment the following line to add a route for porting Web API 2 controllers.
+            //    // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
+            //});
+        }
+    }
+
+
+    public interface IRegisterRoutes
+    {
+        void BuildRoutes(IRouteBuilder builder);
+    }
+
+    public class RegisterRoutes : IRegisterRoutes
+    {
+        public void BuildRoutes(IRouteBuilder builder)
+        {
+            builder.MapRoute(name: "default",
+                template: "{controller=Home}/{action=Index}/{id?}"
+            );
+        }
+    }
+
+    public class SingleActionControllerFactory : IControllerFactory
+    {
+        private readonly IControllerActivator controllerActivator;
+        private readonly IEnumerable<IControllerPropertyActivator> propertyActivators;
+        private readonly DefaultControllerFactory blah;
+
+        public SingleActionControllerFactory(IControllerActivator controllerActivator, IEnumerable<IControllerPropertyActivator> propertyActivators)
+        {
+            this.controllerActivator = controllerActivator;
+            this.propertyActivators = propertyActivators;
+
+        }
+
+        public object CreateController(ActionContext actionContext)
+        {
+            var actionDescriptor = actionContext.ActionDescriptor as ControllerActionDescriptor;
+
+            if(actionDescriptor == null)
+            {
+                throw new ArgumentException("Explosion");
+            }
+
+            var controller = controllerActivator.Create(actionContext, actionDescriptor.ControllerTypeInfo.AsType());
+
+            foreach (var prop in propertyActivators)
+            {
+                prop.Activate(actionContext, controller);
+            }
+
+            return controller;
+        }
+
+        public void ReleaseController(object controller)
+        {
+            var disposableController = controller as IDisposable;
+
+            if(disposableController != null)
+            {
+                disposableController.Dispose();
+            }
         }
     }
 }
