@@ -24,6 +24,7 @@ using Microsoft.Framework.Logging.Console;
 using Microsoft.Framework.Runtime;
 using SandboxASP5Site.Models;
 using SandboxASP5Site.Services;
+using SandboxASP5Site.Infrastructure;
 
 namespace SandboxASP5Site
 {
@@ -141,27 +142,10 @@ namespace SandboxASP5Site
         }
     }
 
-
-    public interface IRegisterRoutes
-    {
-        void BuildRoutes(IRouteBuilder builder);
-    }
-
-    public class RegisterRoutes : IRegisterRoutes
-    {
-        public void BuildRoutes(IRouteBuilder builder)
-        {
-            builder.MapRoute(name: "default",
-                template: "{controller=Home}/{action=Index}/{id?}"
-            );
-        }
-    }
-
     public class SingleActionControllerFactory : IControllerFactory
     {
         private readonly IControllerActivator controllerActivator;
         private readonly IEnumerable<IControllerPropertyActivator> propertyActivators;
-        private readonly DefaultControllerFactory blah;
 
         public SingleActionControllerFactory(IControllerActivator controllerActivator, IEnumerable<IControllerPropertyActivator> propertyActivators)
         {
@@ -198,5 +182,5 @@ namespace SandboxASP5Site
                 disposableController.Dispose();
             }
         }
-    }
+    } 
 }
