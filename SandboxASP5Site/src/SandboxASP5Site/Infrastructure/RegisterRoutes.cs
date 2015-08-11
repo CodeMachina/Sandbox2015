@@ -15,7 +15,7 @@ namespace SandboxASP5Site.Infrastructure
             //TODO: remove route
             builder.MapRoute(name: "blah",
                 template: "blah/blah/blah",
-                defaults: new { controller = "Home", action = "About" },
+                defaults: new {controller = "Home", action = "About" },
                 constraints: new { httpMethod = new HttpMethodRouteConstraint(new[] { "GET" }) }
             );
 
