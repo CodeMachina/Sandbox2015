@@ -20,7 +20,9 @@ namespace SandboxASP5Site.Infrastructure
             );
 
             builder.MapRoute(name: "default",
-                template: "{controller=Home}/{action=Index}/{id?}"
+                template: "{controller=Home}/{action=Index}/{id?}",
+                defaults: new { },
+                constraints: new { httpMethod = new HttpMethodRouteConstraint(new[] { "GET"}) }
             );           
         }
     }

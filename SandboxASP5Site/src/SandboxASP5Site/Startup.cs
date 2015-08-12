@@ -29,6 +29,7 @@ using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.ModelBinding.Validation;
 using Microsoft.Framework.OptionsModel;
 using System.Reflection;
+using SandboxASP5Site.Infrastructure.SingleActionController;
 
 namespace SandboxASP5Site
 {
@@ -86,6 +87,14 @@ namespace SandboxASP5Site
             // Add MVC services to the services container.         
             services.AddMvc();
 
+            //Uncomment the following to setup single action controllers
+            //services.AddMvcSingleActionController()
+            //    .Configure<SingleActionControllerOptions>(options =>
+            //    {
+            //        options.Assembly = typeof(Startup).GetTypeInfo().Assembly;
+            //        options.Namespace = "SandboxASP5Site.ControllersSingleAction";
+            //    });
+
             // Uncomment the following line to add Web API services which makes it easier to port Web API 2 controllers.
             // You will also need to add the Microsoft.AspNet.Mvc.WebApiCompatShim package to the 'dependencies' section of project.json.
             // services.AddWebApiConventions();
@@ -94,10 +103,7 @@ namespace SandboxASP5Site
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
             services.AddSingleton<IRegisterRoutes, RegisterRoutes>();
-            services.TryAddEnumerable(ServiceDescriptor.Transient<IActionInvokerProvider, SingleActionControllerActionInvokerProvider>());
-            services.TryAddEnumerable(ServiceDescriptor.Transient<IActionDescriptorProvider, SingleActionControllerActionDescriptorProvider>());
-            services.AddSingleton<IControllerFactory, SingleActionControllerFactory>();
-            services.AddSingleton<IActionInvoker, SingleActionControllerActionInvoker>();
+            
         }
 
         // Configure is called after ConfigureServices is called.
@@ -147,269 +153,5 @@ namespace SandboxASP5Site
             //    // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
             //});
         }
-    }
-
-    public class SingleActionControllerFactory : IControllerFactory
-    {
-        private readonly IControllerActivator controllerActivator;
-        private readonly IEnumerable<IControllerPropertyActivator> propertyActivators;
-
-        public SingleActionControllerFactory(IControllerActivator controllerActivator, IEnumerable<IControllerPropertyActivator> propertyActivators)
-        {
-            this.controllerActivator = controllerActivator;
-            this.propertyActivators = propertyActivators;
-
-        }
-
-        public object CreateController(ActionContext actionContext)
-        {
-            actionContext.RouteData.Values["action"] = "Execute";
-            var actionDescriptor = actionContext.ActionDescriptor as ControllerActionDescriptor;
-
-            if(actionDescriptor == null)
-            {
-                throw new ArgumentException("Explosion");
-            }
-            
-            var controller = controllerActivator.Create(actionContext, actionDescriptor.ControllerTypeInfo.AsType());
-
-            foreach (var prop in propertyActivators)
-            {
-                prop.Activate(actionContext, controller);
-            }
-
-            return controller;
-        }
-
-        public void ReleaseController(object controller)
-        {
-            var disposableController = controller as IDisposable;
-
-            if(disposableController != null)
-            {
-                disposableController.Dispose();
-            }
-        }
-    }
-
-    public class SingleActionControllerActionDescriptorProvider : IActionDescriptorProvider
-    {
-        public int Order
-        {
-            get
-            {
-                return DefaultOrder.DefaultFrameworkSortOrder;
-            }
-        }
-
-        public void OnProvidersExecuted(ActionDescriptorProviderContext context)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void OnProvidersExecuting(ActionDescriptorProviderContext context)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class SingleActionControllerActionDescriptor : ActionDescriptor
-    {
-
-    }
-
-    public class SingleActionControllerActionInvokerProvider : IActionInvokerProvider
-    {
-        //private readonly IControllerActionArgumentBinder _argumentBinder;
-        //private readonly IControllerFactory _controllerFactory;
-        //private readonly IFilterProvider[] _filterProviders;
-        //private readonly IReadOnlyList<IInputFormatter> _inputFormatters;
-        //private readonly IReadOnlyList<IModelBinder> _modelBinders;
-        //private readonly IReadOnlyList<IOutputFormatter> _outputFormatters;
-        //private readonly IReadOnlyList<IModelValidatorProvider> _modelValidatorProviders;
-        //private readonly IReadOnlyList<IValueProviderFactory> _valueProviderFactories;
-        //private readonly IScopedInstance<ActionBindingContext> _actionBindingContextAccessor;
-        //private readonly ITempDataDictionary _tempData;
-        //private readonly int _maxModelValidationErrors;
-        //private readonly ILoggerFactory _loggerFactory;
-
-        //public SingleActionControllerActionInvokerProvider(
-        //    IControllerFactory controllerFactory,
-        //    IEnumerable<IFilterProvider> filterProviders,
-        //    IControllerActionArgumentBinder argumentBinder,
-        //    IOptions<MvcOptions> optionsAccessor,
-        //    IScopedInstance<ActionBindingContext> actionBindingContextAccessor,
-        //    ITempDataDictionary tempData,
-        //    ILoggerFactory loggerFactory)
-        //    :base (
-        //         controllerFactory,
-        //         filterProviders,
-        //         argumentBinder,
-        //         optionsAccessor,
-        //         actionBindingContextAccessor,
-        //         tempData,
-        //         loggerFactory)
-        //{
-        //    _controllerFactory = controllerFactory;
-        //    _filterProviders = filterProviders.OrderBy(item => item.Order).ToArray();
-        //    _argumentBinder = argumentBinder;
-        //    _inputFormatters = optionsAccessor.Options.InputFormatters.ToArray();
-        //    _outputFormatters = optionsAccessor.Options.OutputFormatters.ToArray();
-        //    _modelBinders = optionsAccessor.Options.ModelBinders.ToArray();
-        //    _modelValidatorProviders = optionsAccessor.Options.ModelValidatorProviders.ToArray();
-        //    _valueProviderFactories = optionsAccessor.Options.ValueProviderFactories.ToArray();
-        //    _actionBindingContextAccessor = actionBindingContextAccessor;
-        //    _maxModelValidationErrors = optionsAccessor.Options.MaxModelValidationErrors;
-        //    _tempData = tempData;
-        //    _loggerFactory = loggerFactory;
-        //}
-
-        //public new void OnProvidersExecuting(ActionInvokerProviderContext context)
-        //{
-        //    var actionDescriptor = context.ActionContext.ActionDescriptor as ControllerActionDescriptor;
-
-        //    if (actionDescriptor != null)
-        //    {
-        //        context.Result = new SingleActionControllerActionInvoker(
-        //                            context.ActionContext,
-        //                            _filterProviders,
-        //                            _controllerFactory,
-        //                            actionDescriptor,
-        //                            _inputFormatters,
-        //                            _outputFormatters,
-        //                            _argumentBinder,
-        //                            _modelBinders,
-        //                            _modelValidatorProviders,
-        //                            _valueProviderFactories,
-        //                            _actionBindingContextAccessor,
-        //                            _tempData,
-        //                            _loggerFactory,
-        //                            _maxModelValidationErrors);
-        //    }
-        //}
-        public int Order
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public void OnProvidersExecuted(ActionInvokerProviderContext context)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void OnProvidersExecuting(ActionInvokerProviderContext context)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class SingleActionControllerActionInvoker : IActionInvoker
-    {
-        //private readonly ControllerActionDescriptor _descriptor;
-        //public SingleActionControllerActionInvoker(
-        //    ActionContext actionContext,
-        //    IReadOnlyList<IFilterProvider> filterProviders,
-        //    IControllerFactory controllerFactory,
-        //    ControllerActionDescriptor descriptor,
-        //    IReadOnlyList<IInputFormatter> inputFormatters,
-        //    IReadOnlyList<IOutputFormatter> outputFormatters,
-        //    IControllerActionArgumentBinder controllerActionArgumentBinder,
-        //    IReadOnlyList<IModelBinder> modelBinders,
-        //    IReadOnlyList<IModelValidatorProvider> modelValidatorProviders,
-        //    IReadOnlyList<IValueProviderFactory> valueProviderFactories,
-        //    IScopedInstance<ActionBindingContext> actionBindingContextAccessor,
-        //    ITempDataDictionary tempData,
-        //    ILoggerFactory loggerFactory,
-        //    int maxModelValidationErrors)
-        //    : base(
-        //          actionContext,
-        //          filterProviders,
-        //          controllerFactory,
-        //          descriptor,
-        //          inputFormatters,
-        //          outputFormatters,
-        //          controllerActionArgumentBinder,
-        //          modelBinders,
-        //          modelValidatorProviders,
-        //          valueProviderFactories,
-        //          actionBindingContextAccessor,
-        //          tempData,
-        //          loggerFactory,             
-        //          maxModelValidationErrors
-        //          )
-        //{
-        //    _descriptor = descriptor;
-        //}
-
-        //protected override async Task<IActionResult> InvokeActionAsync(ActionExecutingContext actionExecutingContext)
-        //{
-        //    var actionMethodInfo = _descriptor.MethodInfo;
-        //    var actionReturnValue = await ControllerActionExecutor.ExecuteAsync(
-        //        actionMethodInfo,
-        //        actionExecutingContext.Controller,
-        //        actionExecutingContext.ActionArguments);
-
-        //    var actionResult = CreateActionResult(
-        //        actionMethodInfo.ReturnType,
-        //        actionReturnValue);
-        //    return actionResult;
-        //}
-
-        //internal static IActionResult CreateActionResult(Type declaredReturnType, object actionReturnValue)
-        //{
-        //    // optimize common path
-        //    var actionResult = actionReturnValue as IActionResult;
-        //    if (actionResult != null)
-        //    {
-        //        return actionResult;
-        //    }
-
-        //    if (declaredReturnType == typeof(void) ||
-        //        declaredReturnType == typeof(Task))
-        //    {
-        //        return new EmptyResult();
-        //    }
-
-        //    // Unwrap potential Task<T> types.
-        //    var actualReturnType = GetTaskInnerTypeOrNull(declaredReturnType) ?? declaredReturnType;
-        //    if (actionReturnValue == null &&
-        //        typeof(IActionResult).GetTypeInfo().IsAssignableFrom(actualReturnType.GetTypeInfo()))
-        //    {
-        //        throw new InvalidOperationException("Kaboom");
-        //    }
-
-        //    return new ObjectResult(actionReturnValue)
-        //    {
-        //        DeclaredType = actualReturnType
-        //    };
-        //}
-
-        //private static Type GetTaskInnerTypeOrNull(Type type)
-        //{
-        //    var genericType = ExtractGenericInterface(type, typeof(Task<>));
-
-        //    return genericType?.GenericTypeArguments[0];
-        //}
-
-        //public static Type ExtractGenericInterface(Type queryType,Type interfaceType)
-        //{
-        //    Func<Type, bool> matchesInterface =
-        //        type => type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == interfaceType;
-        //    if (matchesInterface(queryType))
-        //    {
-        //        // Checked type matches (i.e. is a closed generic type created from) the open generic type.
-        //        return queryType;
-        //    }
-
-        //    // Otherwise check all interfaces the type implements for a match.
-        //    return queryType.GetTypeInfo().ImplementedInterfaces.FirstOrDefault(matchesInterface);
-        //}
-        public Task InvokeAsync()
-        {
-            throw new NotImplementedException();
-        }
-    }
+    }    
 }
