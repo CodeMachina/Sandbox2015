@@ -1,0 +1,18 @@
+﻿{
+  "commands": {
+    "test": "xunit.runner.dnx"
+  },
+  "compilationOptions": {
+    "languageVersion": "csharp6",
+    "warningsAsErrors": true
+  },
+    "dependencies": {
+        "Moq": "4.2.1507.0118",
+        "ProductNames": "0.1.0-*",
+        "xunit": "2.1.0-rc1-build3168",
+        "xunit.runner.dnx": "2.1.0-rc1-build204"
+    },
+  "frameworks": {
+    "dnx46": { }
+  }
+}

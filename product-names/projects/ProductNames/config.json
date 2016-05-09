@@ -1,0 +1,7 @@
+﻿{
+    "Data": {
+        "SqliteConnection": {
+            "ConnectionString": "Data Source=D:\\Scott\\GitHub\\Sandbox2015\\product-names\\projects\\ProductNames\\EmbeddedDataStore\\ProductName.db;"
+        }
+    }
+}
