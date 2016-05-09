@@ -1,7 +1,0 @@
-{
-  "Data": {
-    "DefaultConnection": {
-      "ConnectionString": "Server=(localdb)\\mssqllocaldb;Database=aspnet5-SandboxASP5Site-f3c9276a-6a83-445d-9584-6135406630d7;Trusted_Connection=True;MultipleActiveResultSets=true"
-    }
-  }
-}
