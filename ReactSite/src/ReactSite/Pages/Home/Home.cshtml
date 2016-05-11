@@ -1,0 +1,13 @@
+﻿<html>
+    <head>
+
+    </head>
+    <body>
+        <div id="myApp"></div>
+        <script>
+            var appScript = document.createElement("script");
+            appScript.src = "build/app.js?v=" + Date.now();
+            document.head.appendChild(appScript);
+        </script>
+    </body>
+</html>
