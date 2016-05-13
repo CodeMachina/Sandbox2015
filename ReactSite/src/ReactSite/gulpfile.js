@@ -28,8 +28,8 @@ paths.concatJsDest = paths.webroot + "js/site.min.js";
 paths.concatCssDest = paths.webroot + "css/site.min.css";
 
 paths.appPath = "JSX/app.jsx";
-paths.appOutputName = "app.js";
-paths.finalOutput = "wwwroot/build/";
+paths.appOutputName = "gulp_app.js";
+paths.finalOutput = "wwwroot/build_gulp/";
 
 gulp.task("clean:js", function (cb) {
     rimraf(paths.concatJsDest, cb);
@@ -70,6 +70,7 @@ gulp.task("clean:AppOutput", function (cb) {
 gulp.task("browserify",["clean"], function () {
     return browserify(paths.appPath)
         .transform("reactify")
+        .transform(require("browserify-css"))
         .bundle()
         .pipe(source(paths.appOutputName))
         .pipe(buffer())

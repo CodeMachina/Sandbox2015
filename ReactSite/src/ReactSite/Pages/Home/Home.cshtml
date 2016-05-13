@@ -6,8 +6,13 @@
         <div id="myApp"></div>
         <script>
             var appScript = document.createElement("script");
-            appScript.src = "build/app.js?v=" + Date.now();
+            appScript.src = "build_gulp/gulp_app.js?v=" + Date.now();
             document.head.appendChild(appScript);
         </script>
+        @*<script>
+            var appScript = document.createElement("script");
+            appScript.src = "build_webpack/webpack_app.js?v=" + Date.now();
+            document.head.appendChild(appScript);
+        </script>*@
     </body>
 </html>
