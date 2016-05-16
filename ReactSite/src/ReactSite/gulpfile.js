@@ -12,6 +12,7 @@ var gulp = require("gulp"),
     concat = require("gulp-concat"),
     cssmin = require("gulp-cssmin"),
     uglify = require("gulp-uglify"),
+    eslint = require("gulp-eslint"),
     source = require("vinyl-source-stream"),
     buffer = require("vinyl-buffer"),
     browserify = require("browserify");
@@ -67,9 +68,16 @@ gulp.task("clean:AppOutput", function (cb) {
     rimraf(paths.finalOutput, cb);
 });
 
-gulp.task("browserify",["clean"], function () {
-    return browserify(paths.appPath)
-        .transform("reactify")
+gulp.task("lint", ["clean"], function () {
+    return gulp.src([paths.js, "JSX/**/*.jsx", "JSX/**/*.js"])
+        .pipe(eslint())
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError());
+});
+
+gulp.task("browserify",["lint"], function () {
+    return browserify(paths.appPath)        
+        .transform("babelify", {presets: ["es2015", "react"]})
         .transform(require("browserify-css"))
         .bundle()
         .pipe(source(paths.appOutputName))

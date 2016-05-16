@@ -41,6 +41,13 @@ var commonConfig = {
                 },
                 include: [PATHS.app]
             }
+        ],
+        preLoaders: [
+            {
+                test: /\.jsx?$/,
+                loaders: ['eslint-loader'],
+                include: [PATHS.app, PATHS.js]
+            }
         ]
     },
     resolve: {
