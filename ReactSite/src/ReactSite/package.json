@@ -23,6 +23,8 @@
         "rimraf": "2.5.2",
         "webpack-dev-server": "1.14.1",
         "webpack-merge": "0.12.0",
+        "html-webpack-plugin": "2.17.0",
+        "clean-webpack-plugin": "0.1.9",
         "css-loader": "0.23.1",
         "style-loader": "0.13.1",
         "babel-loader": "6.2.4",
@@ -37,6 +39,7 @@
     },
     "scripts": {
         "build": "webpack",
+        "buildapp" : "webpack",
         "start": "webpack-dev-server --port 8000",
         "lint": "eslint . --ext .js --ext .jsx"
     }

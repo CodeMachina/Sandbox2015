@@ -1,6 +1,8 @@
 ﻿var path = require('path');
 var merge = require('webpack-merge');
 var webpack = require('webpack');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+var CleanWebpackPlugin = require('clean-webpack-plugin');
 
 var _PATH = path.resolve(__dirname); /* global __dirname */
 var PATHS = {
@@ -52,7 +54,24 @@ var commonConfig = {
     },
     resolve: {
         extensions: ['', '.js', '.jsx']
-    }
+    },
+    plugins: [
+        new webpack.optimize.DedupePlugin(),
+        new webpack.optimize.UglifyJsPlugin({
+            compress: {
+                warnings: false
+            },
+            output: {
+                comments: false,
+                semicolons: true
+            }
+        }),
+        new HtmlWebpackPlugin({
+            filename: PATHS.build + "/index.html",
+            template: __dirname + '/indextemplate.html'
+        }),
+        new CleanWebpackPlugin(PATHS.build)
+    ]
 };
 
 if (TARGET === 'start' || !TARGET) {
@@ -62,15 +81,21 @@ if (TARGET === 'start' || !TARGET) {
             historyApiFallback: true,
             hot: true,
             inline: true,
-            progress: true,
-            stats: 'errors-only',
-            host: process.env.HOST,
-            port: process.env.PORT
+            progress: true
         },
         devtool: 'eval-source-map',
         plugins: [
             new webpack.HotModuleReplacementPlugin()
         ]
+    });
+}
+
+if (TARGET === 'buildapp') {
+    module.exports = merge(commonConfig, {
+        output: {
+            path: PATHS.build,
+            filename: 'webpack_app-[chunkhash].js'
+        },
     });
 }
 
