@@ -1,4 +1,4 @@
-﻿/// <binding AfterBuild='appDevBuild' />
+﻿/// <binding BeforeBuild='appDevBuild' />
 "use strict";
 
 /*
@@ -13,6 +13,9 @@ var gulp = require("gulp"),
     cssmin = require("gulp-cssmin"),
     uglify = require("gulp-uglify"),
     eslint = require("gulp-eslint"),
+    hash = require("gulp-rev"),
+    replace = require("gulp-replace"),
+    rename = require("gulp-rename"),
     source = require("vinyl-source-stream"),
     buffer = require("vinyl-buffer"),
     browserify = require("browserify");
@@ -31,6 +34,9 @@ paths.concatCssDest = paths.webroot + "css/site.min.css";
 paths.appPath = "JSX/app.jsx";
 paths.appOutputName = "gulp_app.js";
 paths.finalOutput = "wwwroot/build_gulp/";
+paths.HomeOutput = "Pages/Home/";
+paths.HomeOutputName = "Home.cshtml";
+paths.HomeTemplateName = "HomeTemplate.cshtml";
 
 gulp.task("clean:js", function (cb) {
     rimraf(paths.concatJsDest, cb);
@@ -75,16 +81,36 @@ gulp.task("lint", ["clean"], function () {
         .pipe(eslint.failAfterError());
 });
 
-gulp.task("browserify",["lint"], function () {
-    return browserify(paths.appPath)        
-        .transform("babelify", {presets: ["es2015", "react"]})
+//Transpiles jsx
+//Bundles jsx, js, css
+//Minifies bundle
+//Adds hash to bundle name
+//Creates manifest of old name to hash name
+gulp.task("browserify", ["lint"], function () {
+    return browserify(paths.appPath)
+        .transform("babelify", { presets: ["es2015", "react"] })
         .transform(require("browserify-css"))
         .bundle()
         .pipe(source(paths.appOutputName))
         .pipe(buffer())
         .pipe(uglify())
+        .pipe(hash())
+        .pipe(gulp.dest(paths.finalOutput))
+        .pipe(hash.manifest())
         .pipe(gulp.dest(paths.finalOutput));
 });
 
-gulp.task("appDevBuild", ["browserify"]);
-gulp.task("appProdBuild", ["setReactProductionMode", "browserify"])
+//Replaces static bundle name in .cshtml home file with hashed bundle name
+//Renames .cshtml file
+gulp.task("replace", ["browserify"], function () {
+    return gulp.src(paths.HomeOutput + paths.HomeTemplateName)
+        .pipe(replace("gulp_app.js", function (match) {
+            var manifest = require("./" + paths.finalOutput + "rev-manifest.json");
+            return manifest[match];
+        }))
+        .pipe(rename(paths.HomeOutputName))
+        .pipe(gulp.dest(paths.HomeOutput, { overwrite: true }));
+});
+
+gulp.task("appDevBuild", ["replace"]);
+gulp.task("appProdBuild", ["setReactProductionMode", "replace"])

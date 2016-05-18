@@ -8,12 +8,15 @@ var Default = React.createClass({
           <div>
             <div>Boom react</div>
             <p>a bunch of other stuff written here</p>
-                <section>
-                    <select>
-                        <option value="1">Pizza</option>
-                        <option value="2">Burger</option>
-                    </select>
-                </section>
+            <section>
+                <select>
+                    <option value="1">Pizza</option>
+                    <option value="2">Burger</option>
+                </select>
+            </section>
+            <div>
+                <label>Added an image to change the hash value</label>
+            </div>
           </div>
         );
     }
