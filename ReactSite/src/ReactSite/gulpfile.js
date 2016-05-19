@@ -36,6 +36,7 @@ paths.appOutputName = "gulp_app.js";
 paths.finalOutput = "wwwroot/build_gulp/";
 paths.HomeOutput = "Pages/Home/";
 paths.HomeOutputName = "Home.cshtml";
+paths.HomeTemplatePath = "buildTemplates/gulp/";
 paths.HomeTemplateName = "HomeTemplate.cshtml";
 
 gulp.task("clean:js", function (cb) {
@@ -103,7 +104,7 @@ gulp.task("browserify", ["lint"], function () {
 //Replaces static bundle name in .cshtml home file with hashed bundle name
 //Renames .cshtml file
 gulp.task("replace", ["browserify"], function () {
-    return gulp.src(paths.HomeOutput + paths.HomeTemplateName)
+    return gulp.src(paths.HomeTemplatePath + paths.HomeTemplateName)
         .pipe(replace("gulp_app.js", function (match) {
             var manifest = require("./" + paths.finalOutput + "rev-manifest.json");
             return manifest[match];

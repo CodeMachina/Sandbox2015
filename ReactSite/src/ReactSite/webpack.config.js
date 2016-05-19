@@ -9,7 +9,9 @@ var PATHS = {
     app: path.resolve(_PATH, 'JSX'),
     css: path.resolve(_PATH, 'wwwroot/css'),
     js: path.resolve(_PATH, 'wwwroot/js'),
-    build: path.resolve(_PATH, 'wwwroot/build_webpack')
+    build: path.resolve(_PATH, 'wwwroot/build_webpack'),
+    buildTemplates: path.resolve(_PATH, 'buildTemplates/webpack'),
+    homeOutput: path.resolve(_PATH, 'Pages/Home')
 };
 
 var TARGET = process.env.npm_lifecycle_event;
@@ -21,7 +23,7 @@ var commonConfig = {
     },
     output: {
         path: PATHS.build,
-        filename: 'webpack_app.js'
+        filename: 'webpack_app-[hash].js'
     },
     module: {
         loaders: [
@@ -68,7 +70,16 @@ var commonConfig = {
         }),
         new HtmlWebpackPlugin({
             filename: PATHS.build + "/index.html",
-            template: __dirname + '/indextemplate.html'
+            template: PATHS.buildTemplates + '/indextemplate.html',
+            title: 'React Test Site',
+            inject: false
+        }),
+        new HtmlWebpackPlugin({
+            filename: PATHS.homeOutput + "/Home.cshtml",
+            template: PATHS.buildTemplates + '/HomeTemplate.cshtml',
+            title: 'React Test Site',
+            inject: false,
+            iisAppRoot: 'wwwroot/'
         }),
         new CleanWebpackPlugin(PATHS.build)
     ]
