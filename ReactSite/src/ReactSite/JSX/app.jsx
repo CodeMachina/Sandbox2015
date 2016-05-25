@@ -1,6 +1,7 @@
 ﻿'use strict';
 
-require('../wwwroot/css/main.css');
+//require('../wwwroot/css/main.css');
+require('../wwwroot/less/main.less');
 require('../wwwroot/js/test.js');
 
 var ReactDOM = require('react-dom');

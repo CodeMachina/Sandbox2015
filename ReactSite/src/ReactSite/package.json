@@ -9,6 +9,7 @@
     "devDependencies": {
         "browserify": "13.0.1",
         "browserify-css": "0.9.1",
+        "node-lessify": "0.1.4",
         "babelify": "7.3.0",
         "vinyl-source-stream": "1.1.0",
         "vinyl-buffer": "1.0.0",
@@ -27,6 +28,7 @@
         "clean-webpack-plugin": "0.1.9",
         "css-loader": "0.23.1",
         "style-loader": "0.13.1",
+        "less-loader": "2.2.3",
         "babel-loader": "6.2.4",
         "babel-core": "6.8.0",
         "babel-preset-react": "6.5.0",

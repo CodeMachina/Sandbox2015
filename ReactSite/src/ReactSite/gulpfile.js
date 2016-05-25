@@ -1,4 +1,4 @@
-﻿/// <binding BeforeBuild='appDevBuild' />
+﻿/// <binding />
 "use strict";
 
 /*
@@ -90,7 +90,8 @@ gulp.task("lint", ["clean"], function () {
 gulp.task("browserify", ["lint"], function () {
     return browserify(paths.appPath)
         .transform("babelify", { presets: ["es2015", "react"] })
-        .transform(require("browserify-css"))
+        //.transform(require("browserify-css"))  //used to bundle css files
+        .transform(require("node-lessify")) //used to convert less to css and bundle
         .bundle()
         .pipe(source(paths.appOutputName))
         .pipe(buffer())

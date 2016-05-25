@@ -8,6 +8,7 @@ var _PATH = path.resolve(__dirname); /* global __dirname */
 var PATHS = {
     app: path.resolve(_PATH, 'JSX'),
     css: path.resolve(_PATH, 'wwwroot/css'),
+    less: path.resolve(_PATH, 'wwwroot/less'),
     js: path.resolve(_PATH, 'wwwroot/js'),
     build: path.resolve(_PATH, 'wwwroot/build_webpack'),
     buildTemplates: path.resolve(_PATH, 'buildTemplates/webpack'),
@@ -27,10 +28,15 @@ var commonConfig = {
     },
     module: {
         loaders: [
+            //{
+            //    test: /\.css$/,
+            //    loaders: ['style', 'css'],
+            //    include: [PATHS.app, PATHS.css]
+            //},
             {
-                test: /\.css$/,
-                loaders: ['style', 'css'],
-                include: [PATHS.app, PATHS.css]
+                test: /\.less$/,
+                loaders: ['style', 'css', 'less'],
+                include: [PATHS.app, PATHS.less]
             },
             {
                 test: /\.jsx?$/,
