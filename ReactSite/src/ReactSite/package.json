@@ -41,8 +41,9 @@
     },
     "scripts": {
         "build": "webpack",
-        "buildapp" : "webpack",
-        "start": "webpack-dev-server --port 8000",
+        "buildapp": "webpack",
+        "devserver": "webpack-dev-server --port 8000",
+        "start": "npm run build && npm run devserver",
         "lint": "eslint . --ext .js --ext .jsx"
     }
 }

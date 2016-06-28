@@ -86,12 +86,11 @@ var commonConfig = {
             title: 'React Test Site',
             inject: false,
             iisAppRoot: 'wwwroot/'
-        }),
-        new CleanWebpackPlugin(PATHS.build)
+        })
     ]
 };
 
-if (TARGET === 'start' || !TARGET) {
+if (TARGET === 'devserver' || !TARGET) {
     module.exports = merge(commonConfig, {
         devServer: {
             contentBase: PATHS.build,
@@ -113,9 +112,16 @@ if (TARGET === 'buildapp') {
             path: PATHS.build,
             filename: 'webpack_app-[chunkhash].js'
         },
+        plugins: [
+            new CleanWebpackPlugin(PATHS.build)
+        ]
     });
 }
 
 if (TARGET === 'build') {
-    module.exports = merge(commonConfig, {});
+    module.exports = merge(commonConfig, {
+        plugins: [
+            new CleanWebpackPlugin(PATHS.build)
+        ]
+    });
 }
