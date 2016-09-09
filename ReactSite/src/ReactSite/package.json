@@ -40,10 +40,10 @@
         "eslint-plugin-react": "5.1.1"
     },
     "scripts": {
-        "build": "webpack",
+        "builddev": "webpack",
         "buildapp": "webpack",
         "devserver": "webpack-dev-server --port 8000",
-        "start": "npm run build && npm run devserver",
+        "start": "npm run builddev && npm run devserver",
         "lint": "eslint . --ext .js --ext .jsx"
     }
 }

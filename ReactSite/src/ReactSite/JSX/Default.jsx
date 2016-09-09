@@ -16,6 +16,10 @@ var Default = React.createClass({
             </section>
             <div>
                 <label>Added an image to change the hash value</label>
+                <div>
+                    {/*<img src="http://pre00.deviantart.net/68b1/th/pre/f/2016/160/6/9/image_by_tyler0293-da5l2e1.jpg" />*/}
+                    <img src="http://nomediakings.org/wp-content/uploads/2012/10/gy_poster_600x600.gif"/>
+                </div>
             </div>
           </div>
         );

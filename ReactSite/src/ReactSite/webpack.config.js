@@ -24,7 +24,7 @@ var commonConfig = {
     },
     output: {
         path: PATHS.build,
-        filename: 'webpack_app-[hash].js'
+        filename: 'webpack_app.js'
     },
     module: {
         loaders: [
@@ -73,19 +73,6 @@ var commonConfig = {
                 comments: false,
                 semicolons: true
             }
-        }),
-        new HtmlWebpackPlugin({
-            filename: PATHS.build + "/index.html",
-            template: PATHS.buildTemplates + '/indextemplate.html',
-            title: 'React Test Site',
-            inject: false
-        }),
-        new HtmlWebpackPlugin({
-            filename: PATHS.homeOutput + "/Home.cshtml",
-            template: PATHS.buildTemplates + '/HomeTemplate.cshtml',
-            title: 'React Test Site',
-            inject: false,
-            iisAppRoot: 'wwwroot/'
         })
     ]
 };
@@ -110,18 +97,32 @@ if (TARGET === 'buildapp') {
     module.exports = merge(commonConfig, {
         output: {
             path: PATHS.build,
-            filename: 'webpack_app-[chunkhash].js'
+            filename: 'webpack_app-[hash].js'
         },
         plugins: [
-            new CleanWebpackPlugin(PATHS.build)
+            new CleanWebpackPlugin(PATHS.build),
+            new HtmlWebpackPlugin({
+                filename: PATHS.homeOutput + "/Home.cshtml",
+                template: PATHS.buildTemplates + '/HomeTemplate.cshtml',
+                title: 'React Test Site',
+                inject: false,
+                iisAppRoot: 'wwwroot/'
+            })
         ]
     });
 }
 
-if (TARGET === 'build') {
+
+if (TARGET === 'builddev') {
     module.exports = merge(commonConfig, {
         plugins: [
-            new CleanWebpackPlugin(PATHS.build)
+            new CleanWebpackPlugin(PATHS.build),
+            new HtmlWebpackPlugin({
+                filename: PATHS.build + "/index.html",
+                template: PATHS.buildTemplates + '/indextemplate.html',
+                title: 'React Test Site',
+                inject: false
+            })
         ]
     });
 }
